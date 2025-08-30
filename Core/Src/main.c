@@ -31,9 +31,10 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define GREEN	4
-#define YELLOW	7
-#define RED		9
+#define RED_YELLOW	2
+#define GREEN_RED	4
+#define YELLOW_RED	7
+#define RED_GREEN	9
 
 #define ON 		0
 #define OFF 	1
@@ -54,9 +55,15 @@
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 /* USER CODE BEGIN PFP */
-void red_control(uint8_t n);
-void yellow_control(uint8_t n);
-void green_control(uint8_t n);
+void red1_control(uint8_t n);
+void yellow1_control(uint8_t n);
+void green1_control(uint8_t n);
+
+void red2_control(uint8_t n);
+void yellow2_control(uint8_t n);
+void green2_control(uint8_t n);
+
+void light_set1 (uint8_t n);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -102,20 +109,44 @@ int main(void)
 	while (1)
 	{
 		switch (counter) {
-			case RED: // counter from 0 to 4, making up 5 sec for red light
-				red_control(ON);
-				yellow_control(OFF);
-				green_control(OFF);
+			case RED_GREEN:
+//				red1_control(ON);
+//				yellow1_control(OFF);
+//				green1_control(OFF);
+				light_set1(4);
+
+				red2_control(OFF);
+				yellow2_control(OFF);
+				green2_control(ON);
 				break;
-			case YELLOW: // counter from 8 to 9, making up 3 sec for yellow light
-				red_control(OFF);
-				yellow_control(ON);
-				green_control(OFF);
+			case RED_YELLOW:
+//				red1_control(ON);
+//				yellow1_control(OFF);
+//				green1_control(OFF);
+				light_set1(4);
+
+				red2_control(OFF);
+				yellow2_control(ON);
+				green2_control(OFF);
 				break;
-			case GREEN: // counter from 5 to 7, making up 2 sec for yellow light
-				red_control(OFF);
-				yellow_control(OFF);
-				green_control(ON);
+			case GREEN_RED:
+//				red1_control(OFF);
+//				yellow1_control(OFF);
+//				green1_control(ON);
+				light_set1(1);
+
+				red2_control(ON);
+				yellow2_control(OFF);
+				green2_control(OFF);
+				break;
+			case YELLOW_RED:
+				red1_control(OFF);
+				yellow1_control(ON);
+				green1_control(OFF);
+
+				red2_control(ON);
+				yellow2_control(OFF);
+				green2_control(OFF);
 				break;
 			default:
 				break;
@@ -181,10 +212,13 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOA_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, LED_RED_Pin|LED_YELLOW_Pin|LED_GREEN_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, LED_RED1_Pin|LED_YELLOW1_Pin|LED_GREEN1_Pin|LED_RED2_Pin
+                          |LED_YELLOW2_Pin|LED_GREEN2_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pins : LED_RED_Pin LED_YELLOW_Pin LED_GREEN_Pin */
-  GPIO_InitStruct.Pin = LED_RED_Pin|LED_YELLOW_Pin|LED_GREEN_Pin;
+  /*Configure GPIO pins : LED_RED1_Pin LED_YELLOW1_Pin LED_GREEN1_Pin LED_RED2_Pin
+                           LED_YELLOW2_Pin LED_GREEN2_Pin */
+  GPIO_InitStruct.Pin = LED_RED1_Pin|LED_YELLOW1_Pin|LED_GREEN1_Pin|LED_RED2_Pin
+                          |LED_YELLOW2_Pin|LED_GREEN2_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -196,16 +230,34 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-void red_control(uint8_t n) {
-	HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, n);
+void red1_control(uint8_t n) {
+	HAL_GPIO_WritePin(LED_RED1_GPIO_Port, LED_RED1_Pin, n);
 }
 
-void yellow_control(uint8_t n) {
-	HAL_GPIO_WritePin(LED_YELLOW_GPIO_Port, LED_YELLOW_Pin, n);
+void yellow1_control(uint8_t n) {
+	HAL_GPIO_WritePin(LED_YELLOW1_GPIO_Port, LED_YELLOW1_Pin, n);
 }
 
-void green_control(uint8_t n) {
-	HAL_GPIO_WritePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin, n);
+void green1_control(uint8_t n) {
+	HAL_GPIO_WritePin(LED_GREEN1_GPIO_Port, LED_GREEN1_Pin, n);
+}
+
+void red2_control(uint8_t n) {
+	HAL_GPIO_WritePin(LED_RED2_GPIO_Port, LED_RED2_Pin, n);
+}
+
+void yellow2_control(uint8_t n) {
+	HAL_GPIO_WritePin(LED_YELLOW2_GPIO_Port, LED_YELLOW2_Pin, n);
+}
+
+void green2_control(uint8_t n) {
+	HAL_GPIO_WritePin(LED_GREEN2_GPIO_Port, LED_GREEN2_Pin, n);
+}
+
+void light_set1 (uint8_t n) {
+	HAL_GPIO_WritePin(LED_RED1_GPIO_Port, LED_RED1_Pin, !(n & (1<<2)));
+	HAL_GPIO_WritePin(LED_YELLOW1_GPIO_Port, LED_YELLOW1_Pin, !(n & (1<<1)));
+	HAL_GPIO_WritePin(LED_GREEN1_GPIO_Port, LED_GREEN1_Pin, !(n & (1<<0)));
 }
 /* USER CODE END 4 */
 
