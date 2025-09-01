@@ -31,7 +31,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+#define SPEED_FOR_SECOND	1000 // Millisecond unit
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -42,14 +42,27 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+int led_state = 0x0;
+int hour = 0; // 0-11
+int minute = 0; // 0-59
+int second = 0; // 0-59
 
+int old_state[3] = {0, 0, 0}; // second, minute, hour
+int new_state[3] = {0, 0, 0};
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 /* USER CODE BEGIN PFP */
+void clearAllClock();
+void setNumberOnClock(int num);
+void clearNumberOnClock(int num);
+void update_state();
 
+void test_basic_function();
+void clock_display();
+void update_clock();
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -87,69 +100,15 @@ int main(void)
 	/* Initialize all configured peripherals */
 	MX_GPIO_Init();
 	/* USER CODE BEGIN 2 */
-	HAL_GPIO_WritePin(LED_0_GPIO_Port, LED_0_Pin, 1);
-	HAL_GPIO_WritePin(LED_1_GPIO_Port, LED_1_Pin, 1);
-	HAL_GPIO_WritePin(LED_2_GPIO_Port, LED_2_Pin, 1);
-	HAL_GPIO_WritePin(LED_3_GPIO_Port, LED_3_Pin, 1);
-	HAL_GPIO_WritePin(LED_4_GPIO_Port, LED_4_Pin, 1);
-	HAL_GPIO_WritePin(LED_5_GPIO_Port, LED_5_Pin, 1);
-	HAL_GPIO_WritePin(LED_6_GPIO_Port, LED_6_Pin, 1);
-	HAL_GPIO_WritePin(LED_7_GPIO_Port, LED_7_Pin, 1);
-	HAL_GPIO_WritePin(LED_8_GPIO_Port, LED_8_Pin, 1);
-	HAL_GPIO_WritePin(LED_9_GPIO_Port, LED_9_Pin, 1);
-	HAL_GPIO_WritePin(LED_10_GPIO_Port, LED_10_Pin, 1);
-	HAL_GPIO_WritePin(LED_11_GPIO_Port, LED_11_Pin, 1);
-
-	uint8_t count = 0;
+	clearAllClock();
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 	while (1)
 	{
+		clock_display();
 		/* USER CODE END WHILE */
-		switch(count){
-		case 0:
-			HAL_GPIO_TogglePin(LED_0_GPIO_Port, LED_0_Pin);
-			break;
-		case 1:
-			HAL_GPIO_TogglePin(LED_1_GPIO_Port, LED_1_Pin);
-			break;
-		case 2:
-			HAL_GPIO_TogglePin(LED_2_GPIO_Port, LED_2_Pin);
-			break;
-		case 3:
-			HAL_GPIO_TogglePin(LED_3_GPIO_Port, LED_3_Pin);
-			break;
-		case 4:
-			HAL_GPIO_TogglePin(LED_4_GPIO_Port, LED_4_Pin);
-			break;
-		case 5:
-			HAL_GPIO_TogglePin(LED_5_GPIO_Port, LED_5_Pin);
-			break;
-		case 6:
-			HAL_GPIO_TogglePin(LED_6_GPIO_Port, LED_6_Pin);
-			break;
-		case 7:
-			HAL_GPIO_TogglePin(LED_7_GPIO_Port, LED_7_Pin);
-			break;
-		case 8:
-			HAL_GPIO_TogglePin(LED_8_GPIO_Port, LED_8_Pin);
-			break;
-		case 9:
-			HAL_GPIO_TogglePin(LED_9_GPIO_Port, LED_9_Pin);
-			break;
-		case 10:
-			HAL_GPIO_TogglePin(LED_10_GPIO_Port, LED_10_Pin);
-			break;
-		case 11:
-			HAL_GPIO_TogglePin(LED_11_GPIO_Port, LED_11_Pin);
-			break;
-		default:
-			break;
-		}
-		count = (count + 1) % 12;
-		HAL_Delay(250);
 		/* USER CODE BEGIN 3 */
 	}
 	/* USER CODE END 3 */
@@ -228,7 +187,95 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+void clearAllClock() {
+	led_state = 0xFFF;
+	update_state();
+}
 
+void setNumberOnClock(int num) {
+	led_state = led_state & ~(1 << num);
+	update_state();
+}
+
+void clearNumberOnClock(int num) {
+	led_state = led_state | (1 << num);
+	update_state();
+}
+
+void update_state() {
+	HAL_GPIO_WritePin(LED_0_GPIO_Port, LED_0_Pin, !(~led_state & (1 << 0)));
+	HAL_GPIO_WritePin(LED_1_GPIO_Port, LED_1_Pin, !(~led_state & (1 << 1)));
+	HAL_GPIO_WritePin(LED_2_GPIO_Port, LED_2_Pin, !(~led_state & (1 << 2)));
+	HAL_GPIO_WritePin(LED_3_GPIO_Port, LED_3_Pin, !(~led_state & (1 << 3)));
+	HAL_GPIO_WritePin(LED_4_GPIO_Port, LED_4_Pin, !(~led_state & (1 << 4)));
+	HAL_GPIO_WritePin(LED_5_GPIO_Port, LED_5_Pin, !(~led_state & (1 << 5)));
+	HAL_GPIO_WritePin(LED_6_GPIO_Port, LED_6_Pin, !(~led_state & (1 << 6)));
+	HAL_GPIO_WritePin(LED_7_GPIO_Port, LED_7_Pin, !(~led_state & (1 << 7)));
+	HAL_GPIO_WritePin(LED_8_GPIO_Port, LED_8_Pin, !(~led_state & (1 << 8)));
+	HAL_GPIO_WritePin(LED_9_GPIO_Port, LED_9_Pin, !(~led_state & (1 << 9)));
+	HAL_GPIO_WritePin(LED_10_GPIO_Port, LED_10_Pin, !(~led_state & (1 << 10)));
+	HAL_GPIO_WritePin(LED_11_GPIO_Port, LED_11_Pin, !(~led_state & (1 << 11)));
+}
+
+void test_basic_function() {
+	clearAllClock();
+	for (int i = 0; i < 12; ++i) {
+		setNumberOnClock(i);
+		HAL_Delay(250);
+	}
+
+	for (int i = 0; i < 12; ++i) {
+		clearNumberOnClock(i);
+		HAL_Delay(250);
+	}
+}
+
+void clock_display() { // Note: Proteus messes with modulo operator (%)
+	HAL_Delay(SPEED_FOR_SECOND);
+	++second;
+	if (second >= 60) {
+		second = 0;
+	}
+
+	if (second == 0) {
+		++minute;
+		if (minute >= 60) {
+			minute = 0;
+		}
+		if (minute == 0) {
+			++hour;
+			if (hour >= 12) {
+				hour = 0;
+			}
+		}
+	}
+
+	update_clock();
+}
+
+void update_clock() {
+	new_state[0] = second/5;
+	new_state[1] = minute/5;
+	new_state[2] = hour;
+
+	for (int i = 0; i < 3; ++i) {
+		setNumberOnClock(new_state[i]);
+	}
+
+	for (int i = 0; i < 3; ++i) {
+		int remove_flag = 1;
+		for (int j = 0; j < 3; ++j) {
+			if (old_state[i] == new_state[j]) {
+				remove_flag = 0;
+				break;
+			}
+		}
+		if (remove_flag == 1) {
+			clearNumberOnClock(old_state[i]);
+		}
+		old_state[i] = new_state[i];
+	}
+}
 /* USER CODE END 4 */
 
 /**
