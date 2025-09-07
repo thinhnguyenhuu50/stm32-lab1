@@ -94,36 +94,42 @@ int main(void)
 	MX_GPIO_Init();
 	/* USER CODE BEGIN 2 */
 	uint8_t state = INIT;
-	uint8_t counter = 200;
+	uint8_t counter = 0;
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 	while (1)
 	{
-		if (counter >= 200) {
-			switch (state) {
-			case INIT:
-				red_control(ON);
-				yellow_control(ON);
-				state = RED;
-				break;
-			case RED:
-				red_control(ON);
-				yellow_control(OFF);
+		switch (state) {
+		case INIT:
+			red_control(ON);
+			yellow_control(ON);
+			state = RED;
+			counter = 200;
+			break;
+		case RED:
+			red_control(ON);
+			yellow_control(OFF);
+			--counter;
+			if (counter <= 0) {
 				state = YELLOW;
-				break;
-			case YELLOW:
-				red_control(OFF);
-				yellow_control(ON);
-				state = RED;
-				break;
-			default:
-				break;
+				counter = 200;
 			}
-			counter = 0;
+			break;
+		case YELLOW:
+			red_control(OFF);
+			yellow_control(ON);
+			--counter;
+			if (counter <=0 ) {
+				state = RED;
+				counter = 200;
+			}
+			break;
+		default:
+			break;
 		}
-		++counter;
+
 		HAL_Delay(10);
 		/* USER CODE END WHILE */
 
