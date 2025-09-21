@@ -100,6 +100,7 @@ int main(void)
 	/* Initialize all configured peripherals */
 	MX_GPIO_Init();
 	/* USER CODE BEGIN 2 */
+	HAL_GPIO_WritePin(LED_DEBUG_GPIO_Port, LED_DEBUG_Pin, 1);
 	clearAllClock();
 	/* USER CODE END 2 */
 
@@ -107,8 +108,11 @@ int main(void)
 	/* USER CODE BEGIN WHILE */
 	while (1)
 	{
+		HAL_GPIO_TogglePin(LED_DEBUG_GPIO_Port, LED_DEBUG_Pin);
 		clock_display();
+		HAL_Delay(SPEED_FOR_SECOND);
 		/* USER CODE END WHILE */
+
 		/* USER CODE BEGIN 3 */
 	}
 	/* USER CODE END 3 */
@@ -166,16 +170,19 @@ static void MX_GPIO_Init(void)
 	__HAL_RCC_GPIOA_CLK_ENABLE();
 
 	/*Configure GPIO pin Output Level */
-	HAL_GPIO_WritePin(GPIOA, LED_0_Pin|LED_1_Pin|LED_2_Pin|LED_3_Pin
-			|LED_4_Pin|LED_5_Pin|LED_6_Pin|LED_7_Pin
-			|LED_8_Pin|LED_9_Pin|LED_10_Pin|LED_11_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOA, LED_DEBUG_Pin|LED_0_Pin|LED_1_Pin|LED_2_Pin
+			|LED_3_Pin|LED_4_Pin|LED_5_Pin|LED_6_Pin
+			|LED_7_Pin|LED_8_Pin|LED_9_Pin|LED_10_Pin
+			|LED_11_Pin, GPIO_PIN_RESET);
 
-	/*Configure GPIO pins : LED_0_Pin LED_1_Pin LED_2_Pin LED_3_Pin
-                           LED_4_Pin LED_5_Pin LED_6_Pin LED_7_Pin
-                           LED_8_Pin LED_9_Pin LED_10_Pin LED_11_Pin */
-	GPIO_InitStruct.Pin = LED_0_Pin|LED_1_Pin|LED_2_Pin|LED_3_Pin
-			|LED_4_Pin|LED_5_Pin|LED_6_Pin|LED_7_Pin
-			|LED_8_Pin|LED_9_Pin|LED_10_Pin|LED_11_Pin;
+	/*Configure GPIO pins : LED_DEBUG_Pin LED_0_Pin LED_1_Pin LED_2_Pin
+                           LED_3_Pin LED_4_Pin LED_5_Pin LED_6_Pin
+                           LED_7_Pin LED_8_Pin LED_9_Pin LED_10_Pin
+                           LED_11_Pin */
+	GPIO_InitStruct.Pin = LED_DEBUG_Pin|LED_0_Pin|LED_1_Pin|LED_2_Pin
+			|LED_3_Pin|LED_4_Pin|LED_5_Pin|LED_6_Pin
+			|LED_7_Pin|LED_8_Pin|LED_9_Pin|LED_10_Pin
+			|LED_11_Pin;
 	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
 	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -231,7 +238,7 @@ void test_basic_function() {
 }
 
 void clock_display() { // Note: Proteus messes with modulo operator (%)
-	HAL_Delay(SPEED_FOR_SECOND);
+	update_clock();
 	++second;
 	if (second >= 60) {
 		second = 0;
@@ -249,8 +256,6 @@ void clock_display() { // Note: Proteus messes with modulo operator (%)
 			}
 		}
 	}
-
-	update_clock();
 }
 
 void update_clock() {
