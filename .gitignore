@@ -1,4 +1,4 @@
-proteus/Backup Of lab1.pdsbak
-proteus/lab1.pdsprj.DESKTOP-CBEA33C.Admin.workspace
 Debug/
-proteus/Last Loaded lab1.pdsbak
+proteus/*
+!proteus/lab1.pdsprj
+.settings/
